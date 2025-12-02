@@ -2,11 +2,12 @@ import { StyleSheet } from 'react-native';
 
 import { Text, View } from '@/components/Themed';
 
-export default function IndexScreen() {
+export default function PagoScreen() {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Inicio</Text>
+      <Text style={styles.title}>Pago</Text>
     </View>
+    
   );
 }
 
