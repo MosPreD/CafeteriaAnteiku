@@ -1,13 +1,11 @@
 import { Text, View } from '@/components/Themed';
 import { Ionicons } from '@expo/vector-icons';
-import { useState } from 'react';
 import { Pressable, StyleSheet, TextInput } from 'react-native';
 
 export default function PagoScreen() {
-    const [ciRuc, setCiRuc] = useState("");
   return (
     <View style={styles.container}>
-      <Text style={[styles.title,{ position: 'absolute', top: 15}]}>Pago</Text>
+      <Text style={[styles.title,{ position: 'absolute', top: 15}]}>Metodo de pago</Text>
 
       <Pressable style={[styles.box, {bottom: 200}]} onPress={() => alert("Click!")}>
         <Ionicons name="card-outline" size={48} color="#e9ad55ff"></Ionicons>
@@ -27,7 +25,7 @@ export default function PagoScreen() {
         <Text style={[styles.text, {top:2, color:"#FFFFFF"}]}>Pagar</Text>
         <Ionicons name="bag-check-outline" size={24} color="#e9ad55ff" style={{left:10, bottom:3,}}></Ionicons>
       </Pressable>
-      <Text style={[styles.text, {left:0, top:5, fontSize:18}]}>Total a pagar: </Text>
+      <Text style={[styles.text, {left:0, top:5, fontSize:18}]}>Total a pagar: XXXXXXX</Text>
     </View>
   );
 }
@@ -56,11 +54,6 @@ const styles = StyleSheet.create({
   text: {
     fontWeight: "bold",
     textAlign: "center",
-  },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: '80%',
   },
   box: {
     width: 200,
