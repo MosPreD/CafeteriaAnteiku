@@ -1,32 +1,62 @@
-import { Image, StyleSheet } from 'react-native';
+import React, { useState } from "react";
+import { FlatList, Pressable, StyleSheet, Text } from 'react-native';
 
-import { Text, View } from '@/components/Themed';
+import PedidoPendiente from '@/components/PedidoPendiente';
+import { Producto } from "@/components/types";
+
+type Pedido = {
+  id: string;
+  nroPedido: string;
+  productos: Producto[];
+};
 
 export default function PedidosPendientesScreen() {
-  return (
-    <View style={styles.container}>
-      <View style={[styles.box, {bottom:350}]}>    
-        <Text style={styles.text}>Pedido #001</Text>
-      </View>
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 30, backgroundColor: 'transparent', position: "absolute", top: 200 }}>
-        <Image source={require('@/assets/images/cafe.png')} style={[styles.image, {marginRight: 80}]}/>
-      <Text style={[styles.number, {marginTop:100, marginLeft:12}]}>1</Text>
-        <View style={styles.miniBox}> 
-          <Text style={[styles.text, {marginRight:100, color:"#B9713D"}]}>Pendiente</Text>
-        </View>
-        <View style={[styles.miniBox, {marginLeft: 50}]}> 
-          <Text style={[styles.text, {marginRight:60, color:"#41C519"}]}>Listo</Text>
-        </View>
-      </View>
-    </View>
+  const [pedidos, setPedidos] = useState<Pedido[]>([
+  { 
+    id: "1",
+    nroPedido: "#001",
+    productos: [
+      { id: "p1", tipoCafe:"capuchino", cantidad: 3, estado: "pendiente" as const},
+      { id: "p2", tipoCafe:"expreso", cantidad: 2, estado: "listo" as const },
+      { id: "p3", tipoCafe:"doble", cantidad: 4, estado: "listo" as const },
+    ]
+  },
+  { 
+    id: "2",
+    nroPedido: "#002",
+    productos: [
+      { id: "p1", tipoCafe:"macchiato", cantidad: 5, estado: "listo" as const},
+      { id: "p2", tipoCafe:"latte", cantidad: 1, estado: "pendiente" as const },
+    ]
+  },
+]);
+
+  const limpiarPedido = (id: string) => {
+    setPedidos((prev) => prev.filter((pedido) => pedido.id !== id));
+  };
+ return (
+    <FlatList style={styles.container}
+      data={pedidos}
+      keyExtractor={(item) => item.id}
+      renderItem={({ item }) => (
+        <>
+        <PedidoPendiente 
+        nroPedido={item.nroPedido} 
+        productos={item.productos}
+        />
+
+          <Pressable style={styles.button} onPress={() => limpiarPedido(item.id)}>
+            <Text style={styles.text}>Limpiar Pedido</Text>
+          </Pressable>
+        </>
+      )}
+    />
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    padding: 20,
     backgroundColor: '#EFE6DD',
   },
   title: {
@@ -39,7 +69,7 @@ const styles = StyleSheet.create({
     width: '80%',
   },
   button: {
-    backgroundColor: "#9B7C66",
+    backgroundColor: "#994625ff",
     paddingVertical: 10,
     paddingHorizontal: 50,
     borderRadius: 15,
