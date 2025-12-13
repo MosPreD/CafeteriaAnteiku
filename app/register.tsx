@@ -4,6 +4,7 @@ import {
   Dimensions,
   Image,
   SafeAreaView,
+  ScrollView,
   StatusBar,
   StyleSheet,
   Text,
@@ -42,9 +43,10 @@ const AnteikuRegisterScreen = () => {
     return (
         <SafeAreaView style={styles.safeArea}>
             <StatusBar barStyle="dark-content" />
-            
-            {/* 1. CONTENEDOR PRINCIPAL CON CENTRADO VERTICAL */}
-            <View style={styles.contentContainer}>
+            <ScrollView 
+                        contentContainerStyle={styles.contentContainer} 
+                        keyboardShouldPersistTaps="handled" 
+                        showsVerticalScrollIndicator={false}> 
 
                 {/* --- Logo --- */}
                 <View style={styles.header}>
@@ -109,7 +111,7 @@ const AnteikuRegisterScreen = () => {
                     </TouchableOpacity>
                 </View>
 
-            </View>
+            </ScrollView>
         </SafeAreaView>
     );
 };
@@ -126,13 +128,16 @@ const styles = StyleSheet.create({
         paddingHorizontal: width * 0.01, 
         alignItems: 'center', 
         justifyContent: 'center',
-        paddingBottom: 50, 
+        paddingBottom: 100,
+        paddingTop: 30, 
     },
     header: {
         width: '100%',
+        height: 300,
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
+        paddingTop: 10,
     },
     
     fixedHeader: {
@@ -151,10 +156,8 @@ const styles = StyleSheet.create({
     },
 
     logo: {
-    width: width * 0.45, 
-    height: width * 0.45, 
-    marginTop: -20, 
-    marginBottom: 10,
+    width: '50%', 
+    height: '50%', 
     },
     
     // --- Tipografía y Títulos ---
