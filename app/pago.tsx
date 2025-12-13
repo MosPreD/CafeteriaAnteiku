@@ -1,9 +1,10 @@
-import { Text, View } from '@/components/Themed';
 import { MetodoPago } from '@/components/tiposPagos';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Pressable, StyleSheet, TextInput } from 'react-native';
+import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+
+import { Stack } from 'expo-router';
 
 export default function PagoScreen() {
 
@@ -42,6 +43,10 @@ export default function PagoScreen() {
   };
 
   return (
+    <View style={[{paddingTop:50, flex:1, backgroundColor: '#EFE6DD'}]}>
+     <>
+  <Stack.Screen options={{ title: 'Pago' }} />
+  
     <View style={styles.container}>
       <Text style={[styles.title,{ position: 'absolute', top: 50}]}>Metodo de pago</Text>
 
@@ -174,7 +179,10 @@ export default function PagoScreen() {
     )
   }
     </View>
+    </>
+    </View>
   );
+    
 }
 
 const styles = StyleSheet.create({
