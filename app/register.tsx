@@ -123,7 +123,7 @@ const styles = StyleSheet.create({
 
     contentContainer: {
         flex: 1,
-        paddingHorizontal: width * 0.08,
+        paddingHorizontal: width * 0.01, 
         alignItems: 'center', 
         justifyContent: 'center',
         paddingBottom: 50, 
@@ -133,7 +133,6 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: 40,
     },
     
     fixedHeader: {
@@ -152,10 +151,10 @@ const styles = StyleSheet.create({
     },
 
     logo: {
-    width: 300, 
-    height: 300,
+    width: width * 0.45, 
+    height: width * 0.45, 
     marginTop: -20, 
-    marginBottom: 20,
+    marginBottom: 10,
     },
     
     // --- Tipografía y Títulos ---
@@ -171,7 +170,7 @@ const styles = StyleSheet.create({
         width: '60%',
         fontSize: 16,
         color: '#5D4037',
-        marginBottom: 25, 
+        marginBottom: 15, 
         textAlign: 'left',
     },
     
