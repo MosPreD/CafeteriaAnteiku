@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    paddingHorizontal: width * 0.08, 
+    paddingHorizontal: width * 0.01, 
     alignItems: 'center', 
     justifyContent: 'center', 
     paddingBottom: 50, 
@@ -127,7 +127,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 40,
   },
 
   backArrow: {
@@ -135,10 +134,10 @@ const styles = StyleSheet.create({
     color: '#5D4037', 
   },
   logo: {
-    width: 300,
-    height: 300, 
+    width: width * 0.45, 
+    height: width * 0.45, 
     marginTop: -20, 
-    marginBottom: 20,
+    marginBottom: 10,
   },
   title: {
     width: '60%',
@@ -152,7 +151,7 @@ const styles = StyleSheet.create({
     width: '60%',
     fontSize: 16,
     color: '#5D4037',
-    marginBottom: 30,
+    marginBottom: 10,
     textAlign: 'left',
   },
   label: {
