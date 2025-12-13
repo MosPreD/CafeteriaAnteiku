@@ -4,6 +4,8 @@ import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import PedidoPendiente from '@/components/PedidoPendiente';
 import { Producto } from "@/components/types";
 
+import { Stack } from 'expo-router';
+
 type Pedido = {
   id: string;
   nroPedido: string;
@@ -34,6 +36,7 @@ export function PedidoItem({ item, onLimpiar }: Props) {
 }
 
 export default function PedidosPendientesScreen() {
+  
   const [pedidos, setPedidos] = useState<Pedido[]>([
   { 
     id: "1",
@@ -58,6 +61,10 @@ export default function PedidosPendientesScreen() {
     setPedidos((prev) => prev.filter((pedido) => pedido.id !== id));
   };
  return (
+  <View style={[{paddingTop:50, flex:1, backgroundColor: '#EFE6DD'}]}>
+  <>
+  <Stack.Screen options={{ title: 'Pedidos Pendientes' }} />
+  
   <View style={{ flex: 1, backgroundColor: "#EFE6DD" }}>
     <FlatList
       style={{ backgroundColor: "#EFE6DD" }}
@@ -71,6 +78,10 @@ export default function PedidosPendientesScreen() {
         />
       )}
     />
+    
+  </View>
+  
+  </>
   </View>
   );
 }

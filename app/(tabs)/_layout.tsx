@@ -7,7 +7,6 @@ import { Pressable, View } from 'react-native';
 
 import { useClientOnlyValue } from '@/components/useClientOnlyValue';
 import { useColorScheme } from '@/components/useColorScheme';
-import Colors from '@/constants/Colors';
 
 // You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
 function TabBarIcon(props: {
@@ -25,9 +24,14 @@ export default function TabLayout() {
         tabBarLabelPosition: 'below-icon',
         tabBarActiveTintColor: '#b35512ff',
         tabBarInactiveTintColor: '#705040ff',
-        tabBarStyle: {  height: 110 }, // aumentar altura si hace falta
+        headerTransparent: true, 
+        tabBarStyle: {
+          height: 110,
+          backgroundColor: '#fff5e8ff',
+        },
+        headerTintColor: '#75370A',
         tabBarLabelStyle: {
-          fontSize: 16,    // tamaño de letra
+          fontSize: 16, 
           marginTop: 10,
         },
         // Disable the static render of the header on web
@@ -47,7 +51,7 @@ export default function TabLayout() {
                   <Ionicons
                     name="play-forward-circle-outline"
                     size={24}
-                    color={Colors[colorScheme ?? 'light'].text}
+                    color="#75370A"
                     style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
                   />
                 )}
@@ -59,7 +63,7 @@ export default function TabLayout() {
                   <Ionicons
                     name="cash"
                     size={24}
-                    color={Colors[colorScheme ?? 'light'].text}
+                    color="#75370A"
                     style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
                   />
                 )}
@@ -82,7 +86,7 @@ export default function TabLayout() {
                   <Ionicons
                     name="person"
                     size={24}
-                    color={Colors[colorScheme ?? 'light'].text}
+                    color="#75370A"
                     style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
                   />
                 )}
@@ -95,7 +99,7 @@ export default function TabLayout() {
                   <FontAwesome
                     name="info-circle"
                     size={24}
-                    color={Colors[colorScheme ?? 'light'].text}
+                    color="#75370A"
                     style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
                   />
                 )}
@@ -112,19 +116,6 @@ export default function TabLayout() {
           tabBarIcon: ({ color, size }) => <Ionicons name="cafe" color="#75370A" size={28} style={{marginBottom : -28}} />,
           headerRight: () => (
           <View style={{ flexDirection: 'row', gap: 15, marginRight: 15}}>
-
-            <Link href="/pedido" asChild>
-              <Pressable>
-                {({ pressed }) => (
-                  <Ionicons
-                    name="flame"
-                    size={24}
-                    color={Colors[colorScheme ?? 'light'].text}
-                    style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
-                  />
-                )}
-              </Pressable>
-            </Link>
           </View>
           ),
         }}
