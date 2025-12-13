@@ -1,31 +1,178 @@
 import { Text, View } from '@/components/Themed';
+import { MetodoPago } from '@/components/tiposPagos';
 import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
+import { useState } from 'react';
 import { Pressable, StyleSheet, TextInput } from 'react-native';
 
 export default function PagoScreen() {
+
+  const [openPopupTipoPago, setOpenPopupTipoPago] = useState(false);
+  const [openPopupPagar, setOpenPopupPagar] = useState(false);
+  const [openPopupFinalizar, setOpenPopupFinalizar] = useState(false);
+  const [metodoSeleccionado, setMetodoSeleccionado] = useState<MetodoPago | null>(null);
+  const [ciRuc, setCiRuc] = useState('');
+  const [direccionFiscal, setDireccionFiscal] = useState('');
+  const [error, setError] = useState('');
+  const [openPopupError, setOpenPopupError] = useState(false);
+
+  
+  const METODOS_PAGO = [
+    { key: MetodoPago.TARJETA, label: 'Tarjeta', icon: 'card-outline' },
+    { key: MetodoPago.EFECTIVO, label: 'Efectivo', icon: 'cash-outline' },
+    { key: MetodoPago.PAYPAL, label: 'PayPal', icon: 'logo-paypal' },
+    { key: MetodoPago.TRANSFERENCIA, label: 'Transferencia', icon: 'swap-horizontal-outline' },
+  ];
+
+  const handlePagar = () => {
+    if (!ciRuc.trim() || !direccionFiscal.trim()) {
+      setError('Debe completar CI/RUC y Dirección Fiscal');
+      setOpenPopupError(true);
+      return;
+    }
+
+    if (!metodoSeleccionado) {
+      setError('Debe seleccionar un método de pago');
+      setOpenPopupError(true);
+      return;
+    }
+
+    setError('');
+    setOpenPopupPagar(true);
+  };
+
   return (
     <View style={styles.container}>
-      <Text style={[styles.title,{ position: 'absolute', top: 15}]}>Metodo de pago</Text>
+      <Text style={[styles.title,{ position: 'absolute', top: 50}]}>Metodo de pago</Text>
 
-      <Pressable style={[styles.box, {bottom: 200}]} onPress={() => alert("Click!")}>
-        <Ionicons name="card-outline" size={48} color="#e9ad55ff"></Ionicons>
-        <Text style={styles.text}>Seleccionar{'\n'}metodo de pago</Text>
+      <Pressable style={[styles.box, { bottom: 120, backgroundColor:"#9B7C66" }]} onPress={() => setOpenPopupTipoPago(true)}>
+        <Ionicons name="card-outline" size={48} color="#e9ad55ff" />
+        <Text style={styles.text}>
+          {metodoSeleccionado
+            ? `Método: \n${metodoSeleccionado}`
+            : 'Seleccionar\nmétodo de pago'}
+        </Text>
       </Pressable>
+
 
     <View style={{backgroundColor: '#EFE6DD',justifyContent: 'center', alignItems: 'center', bottom:100, borderRadius: 10, }}>
       <Ionicons name="book-outline" size={38} color="#e9ad55ff" style={{top:30, right:90}}></Ionicons>
       <Text style={styles.text}>Datos de facturacion</Text>
       <Text style={[styles.text, {left:0, marginTop:5}]}>C.I o RUC</Text>
-      <TextInput style={[styles.text, styles.inputBox]} placeholder="CI / RUC"/>
+      <TextInput style={[styles.text, styles.inputBox]} placeholder="CI / RUC" value={ciRuc} onChangeText={setCiRuc}/>
       <Text style={[styles.text, {left:0, marginTop:5, }]}>Direccion Fiscal</Text>
-      <TextInput style={[styles.text, styles.inputBox]} placeholder="Direccion Fiscal"/>
+      <TextInput style={[styles.text, styles.inputBox]} placeholder="Direccion Fiscal" value={direccionFiscal} onChangeText={setDireccionFiscal}/>
+    
+    
     </View>
 
-      <Pressable style={[styles.button, {flexDirection: "row", top:100}]} onPress={() => alert("Click!")}>
-        <Text style={[styles.text, {top:2, color:"#FFFFFF"}]}>Pagar</Text>
-        <Ionicons name="bag-check-outline" size={24} color="#e9ad55ff" style={{left:10, bottom:3,}}></Ionicons>
+      <Pressable style={[styles.button, { flexDirection: "row", top: 100 }]} onPress={handlePagar}>
+        <Text style={[styles.text, { top: 2, color: "#FFFFFF" }]}>Pagar</Text>
+        <Ionicons name="bag-check-outline" size={24} color="#e9ad55ff" style={{ left: 10, bottom: 3 }}/>
       </Pressable>
       <Text style={[styles.text, {left:0, top:5, fontSize:18}]}>Total a pagar: XXXXXXX</Text>
+    
+    {openPopupTipoPago && (
+      <View style={styles.popupOverlay}>
+        <View style={styles.popup}>
+          
+          <Pressable
+            style={styles.closeButton}
+            onPress={() => setOpenPopupTipoPago(false)}
+          >
+            <Ionicons name="close-circle-outline" size={32} color="#fff" />
+          </Pressable>
+
+          <Text style={styles.popupTitle}>Seleccionar método de pago</Text>
+
+          {METODOS_PAGO.map((item) => (
+            <Pressable
+              key={item.key}
+              style={[
+                styles.metodoItem,
+                metodoSeleccionado === item.key && styles.metodoSeleccionado,
+              ]}
+              onPress={() => {
+                setMetodoSeleccionado(item.key);
+                setOpenPopupTipoPago(false);
+              }}
+            >
+              <Ionicons name={item.icon as any} size={28} color="#E9AE50" />
+              <Text style={styles.metodoText}>{item.label}</Text>
+            </Pressable>
+          ))}
+        </View>
+      </View>
+    )}
+    {openPopupPagar && (
+      <View style={styles.popupOverlay}>
+        <View style={styles.popup}>
+
+          <Pressable style={styles.closeButton} onPress={() => setOpenPopupPagar(false)}>
+            <Ionicons name="close-circle-outline" size={32} color="#fff" />
+          </Pressable>
+          <Text style={styles.metodoText}>Método de pago seleccionado:</Text>
+          {(() => {
+        const metodo = METODOS_PAGO.find(
+          (item) => item.key === metodoSeleccionado
+        );
+
+        if (!metodo) {
+          return (
+            <Text style={[styles.metodoText, { marginTop: 8 }]}>
+              No seleccionado
+            </Text>
+          );
+        }
+
+        return (
+          <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10 , backgroundColor:"#ffffff00"}}>
+            <Ionicons
+              name={metodo.icon as any}
+              size={28}
+              color="#E9AE50"
+              style={{ marginRight: 8 }}
+            />
+            <Text style={[styles.metodoText, { fontWeight: 'bold' }]}>
+              {metodo.label}
+            </Text>
+          </View>
+        );
+      })()}
+        <Pressable style={[styles.button, {flexDirection: "row", top:80, backgroundColor:"#ffffff1a"}]} onPress={() => setOpenPopupPagar(false)}>
+          <Text style={[styles.text, {top:2, color:"#FFFFFF"}]} onPress={() => setOpenPopupFinalizar(true)}>Proceder</Text>
+          <Ionicons name="checkmark-circle-outline" size={24} color="#e9ad55ff" style={{left:10, bottom:0,}}></Ionicons>
+        </Pressable>
+        </View>
+      </View>
+    )}
+    {openPopupFinalizar && (
+       <View style={styles.popupOverlay}>
+        <View style={[styles.popup, {width: 350, height: 150}]}>
+          <Pressable style={[styles.closeButton, {bottom:110, left:310}]} 
+          onPress={() =>  { setOpenPopupFinalizar(false);  
+            router.replace('/');
+          }}
+          >
+            <Ionicons name="close-circle-outline" size={32} color="#fff" />
+          </Pressable>
+
+          <Text style={styles.metodoText}>Pago realizado con exito</Text>
+        </View>
+       </View>
+    )
+  }
+  {openPopupError && (
+       <View style={styles.popupOverlay}>
+        <View style={[styles.popup, {width: 350, height: 150}]}>
+          <Pressable style={[styles.closeButton, {bottom:110, left:310}]} onPress={() => {setOpenPopupError(false);}}>
+            <Ionicons name="close-circle-outline" size={32} color="#fff" />
+          </Pressable>
+          <Text style={styles.metodoText}>{error}</Text>
+        </View>
+       </View>
+    )
+  }
     </View>
   );
 }
@@ -71,5 +218,53 @@ const styles = StyleSheet.create({
     borderRadius: 8, 
     width:300, 
     height:40
-  }
+  },
+  popup: {
+    position: 'absolute',
+    borderRadius: 15,
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 300,
+    height: 400,
+    backgroundColor:"#9B7C66", 
+  },
+  closeButton: {
+    position: 'absolute',
+    bottom: 360,
+    left: 260,
+    backgroundColor: '#9B7C66',
+    fontSize: 30,
+  },
+  popupOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  popupTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 20,
+    color: '#ffffffff',
+  },
+  metodoItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
+    borderRadius: 10,
+    backgroundColor: '#EFE6DD',
+    marginBottom: 10,
+  },
+  metodoSeleccionado: {
+    backgroundColor: '#E9AE50',
+  },
+  metodoText: {
+    marginLeft: 12,
+    fontWeight: 'bold',
+  },
 });

@@ -33,7 +33,11 @@ export default function Pedido({producto }: Props) {
             <Image source={imagenesCafe[producto.tipoCafe]} style={styles.image}/>
             <Text style={[styles.textCoffee, { bottom:30, right:50}]}>{tipoCafe}</Text>
           </View>
-            <View style={[styles.number, {marginTop:70, marginLeft:-40}]}>{cantidad}</View>
+            <View style={[styles.number, {marginTop:70, marginLeft:-40}]}>
+              <Text style={{color: "#FFFFFF", fontWeight: "bold", textAlign: "center"}}>
+                {cantidad}
+              </Text>
+            </View>
             
             <View style={miniBoxStyle}>
                 <Text style={[styles.text, 

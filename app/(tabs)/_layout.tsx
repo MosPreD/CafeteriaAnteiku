@@ -25,7 +25,7 @@ export default function TabLayout() {
         tabBarLabelPosition: 'below-icon',
         tabBarActiveTintColor: '#b35512ff',
         tabBarInactiveTintColor: '#705040ff',
-        tabBarStyle: {  height: 80 }, // aumentar altura si hace falta
+        tabBarStyle: {  height: 110 }, // aumentar altura si hace falta
         tabBarLabelStyle: {
           fontSize: 16,    // tamaño de letra
           marginTop: 10,

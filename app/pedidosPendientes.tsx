@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FlatList, Pressable, StyleSheet, Text } from 'react-native';
+import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import PedidoPendiente from '@/components/PedidoPendiente';
 import { Producto } from "@/components/types";
@@ -9,6 +9,29 @@ type Pedido = {
   nroPedido: string;
   productos: Producto[];
 };
+
+type Props = {
+  item: Pedido;
+  onLimpiar: (id: string) => void;
+};
+
+export function PedidoItem({ item, onLimpiar }: Props) {
+  return (
+    <View style={{ marginBottom: 30 }}>
+      <PedidoPendiente
+        nroPedido={item.nroPedido}
+        productos={item.productos}
+      />
+
+      <Pressable
+        style={styles.button}
+        onPress={() => onLimpiar(item.id)}
+      >
+        <Text style={styles.text}>Limpiar Pedido</Text>
+      </Pressable>
+    </View>
+  );
+}
 
 export default function PedidosPendientesScreen() {
   const [pedidos, setPedidos] = useState<Pedido[]>([
@@ -35,22 +58,20 @@ export default function PedidosPendientesScreen() {
     setPedidos((prev) => prev.filter((pedido) => pedido.id !== id));
   };
  return (
-    <FlatList style={styles.container}
+  <View style={{ flex: 1, backgroundColor: "#EFE6DD" }}>
+    <FlatList
+      style={{ backgroundColor: "#EFE6DD" }}
+      contentContainerStyle={{ paddingBottom: 40 }}
       data={pedidos}
       keyExtractor={(item) => item.id}
       renderItem={({ item }) => (
-        <>
-        <PedidoPendiente 
-        nroPedido={item.nroPedido} 
-        productos={item.productos}
+        <PedidoItem
+          item={item}
+          onLimpiar={limpiarPedido}
         />
-
-          <Pressable style={styles.button} onPress={() => limpiarPedido(item.id)}>
-            <Text style={styles.text}>Limpiar Pedido</Text>
-          </Pressable>
-        </>
       )}
     />
+  </View>
   );
 }
 const styles = StyleSheet.create({
