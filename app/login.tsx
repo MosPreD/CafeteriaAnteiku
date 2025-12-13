@@ -4,6 +4,7 @@ import {
   Dimensions,
   Image,
   SafeAreaView,
+  ScrollView,
   StatusBar,
   StyleSheet,
   Text,
@@ -44,54 +45,56 @@ const AnteikuLoginScreen = () => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" />
-      <View style={styles.container}>
+      <ScrollView 
+            contentContainerStyle={styles.container} 
+            keyboardShouldPersistTaps="handled" 
+            showsVerticalScrollIndicator={false}> 
 
-        {/* --- Logo --- */}
-        <View style={styles.header}>
-          <Logo />
-        </View>
+          {/* --- Logo --- */}
+          <View style={styles.header}>
+            <Logo />
+          </View>
 
-        {/* --- Título y Subtítulo --- */}
-        <Text style={styles.title}>Iniciar Sesión</Text>
-        <Text style={styles.subtitle}>Inicia sesión con tu cuenta de Anteiku</Text>
+          {/* --- Título y Subtítulo --- */}
+          <Text style={styles.title}>Iniciar Sesión</Text>
+          <Text style={styles.subtitle}>Inicia sesión con tu cuenta de Anteiku</Text>
 
-        {/* --- Campo Email --- */}
-        <Text style={styles.label}>Email</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="hey@example.com"
-          placeholderTextColor="#A08879"
-          value={email}
-          onChangeText={setEmail}
-          keyboardType="email-address"
-          autoCapitalize="none"
-        />
+          {/* --- Campo Email --- */}
+          <Text style={styles.label}>Email</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="hey@example.com"
+            placeholderTextColor="#A08879"
+            value={email}
+            onChangeText={setEmail}
+            keyboardType="email-address"
+            autoCapitalize="none"
+          />
 
-        {/* --- Campo Contraseña --- */}
-        <Text style={styles.label}>Contraseña</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Introduce tu contraseña"
-          placeholderTextColor="#A08879"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-        />
+          {/* --- Campo Contraseña --- */}
+          <Text style={styles.label}>Contraseña</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Introduce tu contraseña"
+            placeholderTextColor="#A08879"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+          />
 
-        {/* --- Botón Iniciar Sesión --- */}
-        <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-          <Text style={styles.loginButtonText}>Iniciar sesión</Text>
-        </TouchableOpacity>
-
-        {/* --- Enlace Registrarse --- */}
-        <View style={styles.registerContainer}>
-          <Text style={styles.registerText}>¿No tienes cuenta? </Text>
-          <TouchableOpacity onPress={handleRegister}>
-            <Text style={styles.registerLink}>Regístrate aquí</Text>
+          {/* --- Botón Iniciar Sesión --- */}
+          <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
+            <Text style={styles.loginButtonText}>Iniciar sesión</Text>
           </TouchableOpacity>
-        </View>
 
-      </View>
+          {/* --- Enlace Registrarse --- */}
+          <View style={styles.registerContainer}>
+            <Text style={styles.registerText}>¿No tienes cuenta? </Text>
+            <TouchableOpacity onPress={handleRegister}>
+              <Text style={styles.registerLink}>Regístrate aquí</Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
     </SafeAreaView>
   );
 };
@@ -103,30 +106,21 @@ const styles = StyleSheet.create({
     backgroundColor: '#F7F3EF', 
   },
 
-  goHomeButton: {
-    position: 'absolute',
-    top: 30,
-    left: width * 0.08,
-    padding: 10,
-    zIndex: 10, 
-  },
-  goHomeArrow: {
-    fontSize: 16, 
-    color: '#5D4037', 
-    fontWeight: '600',
-  },
   container: {
     flex: 1,
-    paddingHorizontal: width * 0.01, 
     alignItems: 'center', 
     justifyContent: 'center', 
-    paddingBottom: 50, 
+    paddingBottom: 100, 
+    minHeight: '100%',
+    paddingTop: 30,
   },
   header: {
     width: '100%',
+    height: 300,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
+    paddingTop: 10,
   },
 
   backArrow: {
@@ -134,10 +128,8 @@ const styles = StyleSheet.create({
     color: '#5D4037', 
   },
   logo: {
-    width: width * 0.45, 
-    height: width * 0.45, 
-    marginTop: -20, 
-    marginBottom: 10,
+    width: '50%', 
+    height: '50%', 
   },
   title: {
     width: '60%',
@@ -165,13 +157,14 @@ const styles = StyleSheet.create({
   },
   input: {
     width: '60%',
-    height: 50,
-    backgroundColor: '#EAE0D7', // Fondo del input beige/marrón claro
+    height: 48,
+    backgroundColor: '#EAE0D7', 
     borderRadius: 10,
     paddingHorizontal: 15,
+    paddingVertical: 15,
     fontSize: 16,
     borderWidth: 1,
-    borderColor: '#D4C4B8', // Borde sutil
+    borderColor: '#D4C4B8', 
     color: '#5D4037',
     // Estilo para simular el sombreado de la imagen
     shadowColor: '#000',
@@ -183,12 +176,11 @@ const styles = StyleSheet.create({
   loginButton: {
     width: '60%',
     height: 50,
-    backgroundColor: '#A08879', // Color marrón del botón
+    backgroundColor: '#A08879', 
     borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 40,
-    // Estilo para simular el sombreado del botón
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.2,
@@ -212,7 +204,7 @@ const styles = StyleSheet.create({
   registerLink: {
     fontSize: 14,
     fontWeight: 'bold',
-    color: '#A08879', // Color marrón de enlace
+    color: '#A08879', 
     textDecorationLine: 'underline',
   },
 });
