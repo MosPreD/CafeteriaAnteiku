@@ -4,3 +4,9 @@ export interface Producto {
   cantidad: number;
   estado: "pendiente" | "listo";
 }
+
+export interface Catalogo {
+  id: string;
+  nombre: string;
+  tipoCafe: string;
+}
