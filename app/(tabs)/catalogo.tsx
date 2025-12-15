@@ -100,6 +100,8 @@ export default function AnteikuCatalogScreen() {
   });
 
   return (
+      <View style={[{paddingTop:50, flex:1, backgroundColor: '#EFE6DD'}]}>
+    <>
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" />
 
@@ -226,6 +228,8 @@ export default function AnteikuCatalogScreen() {
         </View>
       )}
     </SafeAreaView> 
+    </>
+    </View>
   );
 }
 
