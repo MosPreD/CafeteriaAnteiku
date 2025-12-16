@@ -1,6 +1,8 @@
 import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
+  ActivityIndicator,
+  Alert,
   Dimensions,
   Image,
   SafeAreaView,
@@ -12,17 +14,68 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { useDatabase } from '../contexts/databaseContext';
+import { userService } from './services/UserService';
 
 const { width } = Dimensions.get('window');
 
-// --- Componente principal de la pantalla de Login ---
 const AnteikuLoginScreen = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [isInitializing, setIsInitializing] = useState(true);
+  
   const router = useRouter();
+  const { db, isReady } = useDatabase(); // Usamos el contexto
 
-  const handleLogin = () => {
-    console.log('Iniciar sesión con:', email, password);
+  useEffect(() => {
+    if (db && isReady) {
+      // La base de datos ya está configurada en el contexto
+      setIsInitializing(false);
+    }
+  }, [db, isReady]);
+
+  const handleLogin = async () => {
+    if (!email || !password) {
+      Alert.alert('Error', 'Por favor ingresa email y contraseña');
+      return;
+    }
+
+    setLoading(true);
+    
+    try {
+      console.log('Intentando login con:', email);
+      
+      const usuario = await userService.login(email, password);
+      
+      if (usuario) {
+        console.log('Login exitoso:', usuario.nombre);
+        Alert.alert(
+          '¡Bienvenido!',
+          `Hola ${usuario.nombre}, has iniciado sesión exitosamente`,
+          [
+            {
+              text: 'OK',
+              onPress: () => {
+                router.replace('/(tabs)/catalogo'); 
+              }
+            }
+          ]
+        );
+        
+        // Limpiar campos
+        setEmail('');
+        setPassword('');
+        
+      } else {
+        Alert.alert('Error', 'Email o contraseña incorrectos');
+      }
+    } catch (error: any) {
+      console.error('Error en login:', error);
+      Alert.alert('Error', error.message || 'Ocurrió un error al iniciar sesión');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleRegister = () => {
@@ -30,82 +83,128 @@ const AnteikuLoginScreen = () => {
   };
 
   const handleGoHome = () => {
-      console.log('Volviendo a la pantalla de Inicio...');
-      router.replace('/'); 
+    console.log('Volviendo a la pantalla de Inicio...');
+    router.replace('/'); 
   };
 
   const Logo = () => (
-      <Image
-        source={require('../assets/images/iconoAnteiku.png')}
-        style={styles.logo}
-        resizeMode="contain"
-      />
+    <Image
+      source={require('../assets/images/iconoAnteiku.png')}
+      style={styles.logo}
+      resizeMode="contain"
+    />
   );
+
+  // Mostrar loading mientras se inicializa la DB
+  if (isInitializing || !isReady) {
+    return (
+      <SafeAreaView style={styles.safeArea}>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#A08879" />
+          <Text style={styles.loadingText}>Inicializando base de datos...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" />
       <ScrollView 
-            contentContainerStyle={styles.container} 
-            keyboardShouldPersistTaps="handled" 
-            showsVerticalScrollIndicator={false}> 
+        contentContainerStyle={styles.container} 
+        keyboardShouldPersistTaps="handled" 
+        showsVerticalScrollIndicator={false}
+      > 
+        {/* --- Logo --- */}
+        <View style={styles.header}>
+          <Logo />
+        </View>
 
-          {/* --- Logo --- */}
-          <View style={styles.header}>
-            <Logo />
-          </View>
+        {/* --- Título y Subtítulo --- */}
+        <Text style={styles.title}>Iniciar Sesión</Text>
+        <Text style={styles.subtitle}>Inicia sesión con tu cuenta de Anteiku</Text>
 
-          {/* --- Título y Subtítulo --- */}
-          <Text style={styles.title}>Iniciar Sesión</Text>
-          <Text style={styles.subtitle}>Inicia sesión con tu cuenta de Anteiku</Text>
+        {/* --- Campo Email --- */}
+        <Text style={styles.label}>Email</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="hey@example.com"
+          placeholderTextColor="#A08879"
+          value={email}
+          onChangeText={setEmail}
+          keyboardType="email-address"
+          autoCapitalize="none"
+          editable={!loading}
+        />
 
-          {/* --- Campo Email --- */}
-          <Text style={styles.label}>Email</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="hey@example.com"
-            placeholderTextColor="#A08879"
-            value={email}
-            onChangeText={setEmail}
-            keyboardType="email-address"
-            autoCapitalize="none"
-          />
+        {/* --- Campo Contraseña --- */}
+        <Text style={styles.label}>Contraseña</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Introduce tu contraseña"
+          placeholderTextColor="#A08879"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+          editable={!loading}
+        />
 
-          {/* --- Campo Contraseña --- */}
-          <Text style={styles.label}>Contraseña</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Introduce tu contraseña"
-            placeholderTextColor="#A08879"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-          />
-
-          {/* --- Botón Iniciar Sesión --- */}
-          <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
+        {/* --- Botón Iniciar Sesión --- */}
+        <TouchableOpacity 
+          style={[styles.loginButton, loading && styles.loginButtonDisabled]} 
+          onPress={handleLogin}
+          disabled={loading}
+        >
+          {loading ? (
+            <ActivityIndicator color="#FFFFFF" />
+          ) : (
             <Text style={styles.loginButtonText}>Iniciar sesión</Text>
-          </TouchableOpacity>
+          )}
+        </TouchableOpacity>
 
-          {/* --- Enlace Registrarse --- */}
-          <View style={styles.registerContainer}>
-            <Text style={styles.registerText}>¿No tienes cuenta? </Text>
-            <TouchableOpacity onPress={handleRegister}>
-              <Text style={styles.registerLink}>Regístrate aquí</Text>
-            </TouchableOpacity>
-          </View>
-        </ScrollView>
+        {/* --- Enlace Registrarse --- */}
+        <View style={styles.registerContainer}>
+          <Text style={styles.registerText}>¿No tienes cuenta? </Text>
+          <TouchableOpacity onPress={handleRegister} disabled={loading}>
+            <Text style={styles.registerLink}>Regístrate aquí</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* --- Información sobre almacenamiento local --- */}
+        <View style={styles.infoBox}>
+          <Text style={styles.infoTitle}>📱 Datos locales</Text>
+          <Text style={styles.infoText}>
+            • Tu información se guarda de forma segura en este dispositivo
+          </Text>
+          <Text style={styles.infoText}>
+            • Funciona completamente sin conexión a internet
+          </Text>
+          <Text style={styles.infoText}>
+            • Solo tú tienes acceso a tus datos
+          </Text>
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };
 
-// --- Estilos ---
+// --- Estilos (con algunas adiciones) ---
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: '#F7F3EF', 
   },
-
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F7F3EF',
+  },
+  loadingText: {
+    marginTop: 20,
+    fontSize: 16,
+    color: '#5D4037',
+  },
   container: {
     flex: 1,
     alignItems: 'center', 
@@ -122,7 +221,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingTop: 10,
   },
-
   backArrow: {
     fontSize: 28,
     color: '#5D4037', 
@@ -166,7 +264,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#D4C4B8', 
     color: '#5D4037',
-    // Estilo para simular el sombreado de la imagen
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
@@ -187,8 +284,12 @@ const styles = StyleSheet.create({
     shadowRadius: 3,
     elevation: 5,
   },
+  loginButtonDisabled: {
+    backgroundColor: '#C5B5A9',
+    opacity: 0.7,
+  },
   loginButtonText: {
-    color: '#FFFFFF', // Texto blanco
+    color: '#FFFFFF',
     fontSize: 18,
     fontWeight: 'bold',
   },
@@ -206,6 +307,27 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#A08879', 
     textDecorationLine: 'underline',
+  },
+  infoBox: {
+    width: '80%',
+    backgroundColor: '#EAE0D7',
+    borderRadius: 10,
+    padding: 15,
+    marginTop: 30,
+    borderWidth: 1,
+    borderColor: '#D4C4B8',
+  },
+  infoTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#5D4037',
+    marginBottom: 8,
+  },
+  infoText: {
+    fontSize: 14,
+    color: '#5D4037',
+    marginBottom: 5,
+    lineHeight: 20,
   },
 });
 
