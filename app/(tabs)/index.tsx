@@ -1,12 +1,16 @@
-import { StyleSheet } from 'react-native';
+import { Image, StyleSheet, Text } from 'react-native';
 
-import { Text, View } from '@/components/Themed';
+import { View } from '@/components/Themed';
 
 export default function IndexScreen() {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Inicio</Text>
+      <Image style={styles.header} source={require('@/assets/images/iconoAnteiku.png')} resizeMode="contain"/>
+      <View style={styles.separator} lightColor="#75370A" darkColor="rgba(255,255,255,0.1)">
+        <Text style={styles.title}>¡BIENVENIDO!</Text>
+      </View>
     </View>
+    
   );
 }
 
@@ -20,10 +24,19 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: 'bold',
+    color: '#FFFFFF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 10,
   },
   separator: {
     marginVertical: 30,
-    height: 1,
+    height: 50,
     width: '80%',
+    alignItems: 'center',
+  },
+  header: {
+    backgroundColor: '#EFE6DD',
+    height: '35%',
   },
 });

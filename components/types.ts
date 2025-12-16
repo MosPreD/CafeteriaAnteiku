@@ -9,4 +9,6 @@ export interface Catalogo {
   id: string;
   nombre: string;
   tipoCafe: string;
+  precio: number;
+  cantidad: number;
 }
