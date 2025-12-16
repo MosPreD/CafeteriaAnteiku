@@ -4,7 +4,9 @@ import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
 import { Pressable } from 'react-native';
 
+import { ItemCarrito, useCarrito } from "@/app/context/CarritoContext";
 import { imagenesCafe } from "@/components/imagenesCafe";
+
 
 import {
   Image,
@@ -24,25 +26,14 @@ type CafeType = {
   catalogo: Catalogo[];
 };
 
-type ItemCarrito = {
-  id: string;
-  nombre: string;
-  tipoCafe: string;
-};
-
 /* ------------------ PANTALLA PRINCIPAL ------------------ */
 export default function AnteikuCatalogScreen() {
   const [searchText, setSearchText] = useState('');
   const [favoritos, setFavoritos] = useState<string[]>([]);
   const [mostrarFavoritos, setMostrarFavoritos] = useState(false);
-  const [carrito, setCarrito] = useState<ItemCarrito[]>([]);
   const [openPopupAgregar, setopenPopupAgregar] = useState(false);
   const [cafeSeleccionado, setCafeSeleccionado] = useState<ItemCarrito | null>(null);
-
-
-  const agregarAlCarrito = (item: ItemCarrito) => {
-    setCarrito(prev => [...prev, item]);
-  };
+  const { agregarAlCarrito } = useCarrito();
 
   const toggleFavorito = (id: string) => {
     setFavoritos(prev =>
@@ -57,27 +48,27 @@ export default function AnteikuCatalogScreen() {
     id: '1',
     tipoCafe: 'Cafe',
     catalogo: [
-      { id: '1', nombre: 'Expreso', tipoCafe: 'expreso' },
-      { id: '2', nombre: 'Doble',  tipoCafe: 'doble' },
-      { id: '3', nombre: 'Americano',  tipoCafe: 'americano' },
+      { id: '1', nombre: 'Expreso', tipoCafe: 'expreso', precio: 5000, cantidad: 1 },
+      { id: '2', nombre: 'Doble',  tipoCafe: 'doble', precio: 2500, cantidad: 1 },
+      { id: '3', nombre: 'Americano',  tipoCafe: 'americano', precio: 3000, cantidad: 1 },
     ],
   },
   {
     id: '2',
     tipoCafe: 'CafeConLeche',
     catalogo: [
-      { id: '4', nombre: 'Cafe Con Leche',  tipoCafe: 'cafe_leche' },
-      { id: '5', nombre: 'Cortado', tipoCafe: 'cortado' },
-      { id: '6', nombre: 'Hawaiano', tipoCafe: 'hawaiano' },
+      { id: '4', nombre: 'Cafe Con Leche',  tipoCafe: 'cafe_leche', precio: 6000, cantidad: 1 },
+      { id: '5', nombre: 'Cortado', tipoCafe: 'cortado', precio: 1500, cantidad: 1 },
+      { id: '6', nombre: 'Hawaiano', tipoCafe: 'hawaiano', precio: 1000, cantidad: 1 },
     ],
   },
   {
     id: '3',
     tipoCafe: 'Espumoso',
     catalogo: [
-      { id: '7', nombre: 'Macchiato', tipoCafe: 'macchiato' },
-      { id: '8', nombre: 'Capuchino', tipoCafe: 'capuchino' },
-      { id: '9', nombre: 'Latte', tipoCafe: 'latte' },
+      { id: '7', nombre: 'Macchiato', tipoCafe: 'macchiato', precio: 8000, cantidad: 1 },
+      { id: '8', nombre: 'Capuchino', tipoCafe: 'capuchino', precio: 3200, cantidad: 1 },
+      { id: '9', nombre: 'Latte', tipoCafe: 'latte', precio: 9000, cantidad: 1 },
     ],
   },
 ]);
@@ -157,6 +148,8 @@ export default function AnteikuCatalogScreen() {
                             id: item.id,
                             nombre: item.nombre,
                             tipoCafe: item.tipoCafe,
+                            precio: item.precio,
+                            cantidad: item.cantidad,
                           };
 
                           setCafeSeleccionado(cafe);
@@ -168,6 +161,7 @@ export default function AnteikuCatalogScreen() {
                           style={styles.image}
                         />
                         <Text style={styles.itemText}>{item.nombre}</Text>
+                        <Text style={styles.itemText}>{item.precio}</Text>
                       </TouchableOpacity>
 
                       {/* FAVORITO */}
@@ -214,7 +208,9 @@ export default function AnteikuCatalogScreen() {
             <Pressable
               style={{ flexDirection: 'row', alignItems: 'center', marginTop: 20 }}
               onPress={() => {
-                setCarrito(prev => [...prev, cafeSeleccionado]);
+                if (cafeSeleccionado) {
+                  agregarAlCarrito(cafeSeleccionado);
+                }
                 setopenPopupAgregar(false);
               }}
             >

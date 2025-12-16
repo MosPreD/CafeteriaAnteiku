@@ -1,3 +1,4 @@
+import { CarritoProvider } from "@/app/context/CarritoContext";
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
@@ -58,6 +59,7 @@ export default function RootLayout() {
 
 function RootLayoutNav() {
   return (
+     <CarritoProvider>
     <View style={{flex:1, backgroundColor: '#FAF7F3'}}>
     <ThemeProvider value={CustomTheme}>
       <Stack
@@ -78,5 +80,6 @@ function RootLayoutNav() {
     </Stack>
     </ThemeProvider>
     </View>
+    </CarritoProvider>
   );
 }
