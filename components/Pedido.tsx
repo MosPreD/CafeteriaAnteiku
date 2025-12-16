@@ -8,7 +8,7 @@ interface Props {
 
 export default function Pedido({producto }: Props) {
   
-  const { tipoCafe, cantidad, estado } = producto;
+  const { tipoCafe, nombre, cantidad, estado } = producto;
   const imagen = imagenesCafe[tipoCafe] || imagenesCafe['default'];
 
   const isPendiente = estado === "pendiente";
@@ -31,7 +31,7 @@ export default function Pedido({producto }: Props) {
         <View style={{ flexDirection: "row", padding:30, alignItems: "center" }}>
           <View style={{ alignItems: "center" }}>
             <Image source={imagenesCafe[producto.tipoCafe]} style={styles.image}/>
-            <Text style={[styles.textCoffee, { bottom:30, right:50}]}>{tipoCafe}</Text>
+            <Text style={[styles.textCoffee, { bottom:30, right:50}]}>{nombre}</Text>
           </View>
             <View style={[styles.number, {marginTop:70, marginLeft:-40}]}>
               <Text style={{color: "#FFFFFF", fontWeight: "bold", textAlign: "center"}}>

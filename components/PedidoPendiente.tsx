@@ -17,6 +17,7 @@ export default function PedidoPendiente({nroPedido = "#000",  productos }: Props
               <Pedido 
                 key={p.id} 
                 producto={p} />
+                
             ))}
         </View>
     );

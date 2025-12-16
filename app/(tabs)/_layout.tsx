@@ -57,18 +57,6 @@ export default function TabLayout() {
                 )}
               </Pressable>
             </Link>
-            <Link href="/pago" asChild>
-              <Pressable>
-                {({ pressed }) => (
-                  <Ionicons
-                    name="cash"
-                    size={24}
-                    color="#75370A"
-                    style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
-                  />
-                )}
-              </Pressable>
-            </Link>
           </View>
           ),
         }}

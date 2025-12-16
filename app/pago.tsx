@@ -6,6 +6,9 @@ import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { Stack } from 'expo-router';
 
+import { useCarrito } from "@/app/context/CarritoContext";
+import { usePedidos } from "@/app/context/PedidosContext";
+
 export default function PagoScreen() {
 
   const [openPopupTipoPago, setOpenPopupTipoPago] = useState(false);
@@ -16,7 +19,8 @@ export default function PagoScreen() {
   const [direccionFiscal, setDireccionFiscal] = useState('');
   const [error, setError] = useState('');
   const [openPopupError, setOpenPopupError] = useState(false);
-
+  const { carrito, limpiarCarrito } = useCarrito();
+  const { agregarPedido } = usePedidos();
   
   const METODOS_PAGO = [
     { key: MetodoPago.TARJETA, label: 'Tarjeta', icon: 'card-outline' },
@@ -40,6 +44,25 @@ export default function PagoScreen() {
 
     setError('');
     setOpenPopupPagar(true);
+  };
+
+  const finalizarPago = () => {
+    if (carrito.length === 0) return;
+
+    agregarPedido(
+      carrito.map(item => ({
+        id: item.id,
+        nombre: item.nombre,
+        tipoCafe: item.tipoCafe,
+        cantidad: item.cantidad,
+        estado: "pendiente" as const,
+      }))
+    );
+    limpiarCarrito();
+
+    // 👉 CERRAR POPUP Y VOLVER A INICIO
+    setOpenPopupFinalizar(false);
+    router.replace('/');
   };
 
   return (
@@ -154,13 +177,12 @@ export default function PagoScreen() {
     {openPopupFinalizar && (
        <View style={styles.popupOverlay}>
         <View style={[styles.popup, {width: 350, height: 150}]}>
-          <Pressable style={[styles.closeButton, {bottom:110, left:310}]} 
-          onPress={() =>  { setOpenPopupFinalizar(false);  
-            router.replace('/');
-          }}
-          >
-            <Ionicons name="close-circle-outline" size={32} color="#fff" />
-          </Pressable>
+          <Pressable
+        style={[styles.closeButton, { bottom: 110, left: 310 }]}
+        onPress={finalizarPago}
+      >
+        <Ionicons name="close-circle-outline" size={32} color="#fff" />
+      </Pressable>
 
           <Text style={styles.metodoText}>Pago realizado con exito</Text>
         </View>

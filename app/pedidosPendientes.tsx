@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+import React from "react";
 import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import PedidoPendiente from '@/components/PedidoPendiente';
 import { Producto } from "@/components/types";
 
+import { usePedidos } from "@/app/context/PedidosContext";
 import { Stack } from 'expo-router';
+
 
 type Pedido = {
   id: string;
@@ -36,30 +38,8 @@ export function PedidoItem({ item, onLimpiar }: Props) {
 }
 
 export default function PedidosPendientesScreen() {
-  
-  const [pedidos, setPedidos] = useState<Pedido[]>([
-  { 
-    id: "1",
-    nroPedido: "#001",
-    productos: [
-      { id: "p1", tipoCafe:"capuchino", cantidad: 3, estado: "pendiente" as const},
-      { id: "p2", tipoCafe:"expreso", cantidad: 2, estado: "listo" as const },
-      { id: "p3", tipoCafe:"doble", cantidad: 4, estado: "listo" as const },
-    ]
-  },
-  { 
-    id: "2",
-    nroPedido: "#002",
-    productos: [
-      { id: "p1", tipoCafe:"macchiato", cantidad: 5, estado: "listo" as const},
-      { id: "p2", tipoCafe:"latte", cantidad: 1, estado: "pendiente" as const },
-    ]
-  },
-]);
+  const { pedidos, limpiarPedido } = usePedidos();
 
-  const limpiarPedido = (id: string) => {
-    setPedidos((prev) => prev.filter((pedido) => pedido.id !== id));
-  };
  return (
   <View style={[{paddingTop:50, flex:1, backgroundColor: '#EFE6DD'}]}>
   <>
@@ -77,6 +57,11 @@ export default function PedidosPendientesScreen() {
           onLimpiar={limpiarPedido}
         />
       )}
+       ListEmptyComponent={
+          <Text style={{ textAlign: "center", marginTop: 40 }}>
+            No hay pedidos pendientes
+          </Text>
+        }
     />
     
   </View>

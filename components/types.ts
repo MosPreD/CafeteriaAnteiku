@@ -1,5 +1,6 @@
 export interface Producto {
   id: string;
+  nombre: string;
   tipoCafe: string;
   cantidad: number;
   estado: "pendiente" | "listo";
