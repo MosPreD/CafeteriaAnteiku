@@ -17,6 +17,7 @@ app.add_middleware(
         "http://localhost:19006", # Expo antiguo
         "http://127.0.0.1:8081",
         "http://localhost:3000",  # por si usás React web
+        "http://192.168.100.99:8081",  # Para dispositivo
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -132,3 +133,8 @@ def login(usuario: UsuarioLogin):
     finally:
         if conn:
             conn.close()
+
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)

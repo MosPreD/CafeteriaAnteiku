@@ -1,13 +1,13 @@
+import { useAuth } from "@/app/context/AuthContext";
 import { useCarrito } from "@/app/context/CarritoContext";
-import { usePedidos } from "@/app/context/PedidosContext";
 import { imagenesCafe } from "@/components/imagenesCafe";
 import { Text } from '@/components/Themed';
 import { router } from 'expo-router';
-import { FlatList, Image, Pressable, StyleSheet, View } from 'react-native';
+import { Alert, FlatList, Image, Pressable, StyleSheet, View } from 'react-native';
 
 export default function CarritoScreen() {
   const { carrito, aumentarCantidad, disminuirCantidad, limpiarCarrito  } = useCarrito();
-  const { agregarPedido } = usePedidos();
+  const { usuario } = useAuth();
 
   const total = carrito.reduce(
   (acc, item) => acc + item.precio * item.cantidad,
@@ -18,58 +18,73 @@ export default function CarritoScreen() {
     <View style={[{paddingTop:60, flex:1, backgroundColor: '#EFE6DD'}]}>
       <View style={styles.container}>
 
-        <FlatList
-          data={carrito}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <View style={styles.item}>
-  <Image
-    source={imagenesCafe[item.tipoCafe] ?? imagenesCafe.default}
-    style={styles.image}
-  />
+        {carrito.length === 0 ? (
+          <View style={styles.emptyContainer}>
+            <Text style={styles.emptyText}>
+              Pedido vacío, agregue sus favoritos en el{' '}
+              <Text style={styles.link} onPress={() => router.push('/catalogo')}>
+                catálogo
+              </Text>
+            </Text>
+          </View>
+        ) : (
+          <>
+            <FlatList
+              data={carrito}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) => (
+                <View style={styles.item}>
+                  <Image
+                    source={imagenesCafe[item.tipoCafe] ?? imagenesCafe.default}
+                    style={styles.image}
+                  />
 
-  <View style={styles.infoBox}>
-    <Text style={styles.text}>{item.nombre}</Text>
-    <Text style={styles.precio}>Gs. {item.precio}</Text>
+                  <View style={styles.infoBox}>
+                    <Text style={styles.text}>{item.nombre}</Text>
+                    <Text style={styles.precio}>Gs. {item.precio}</Text>
 
-    {/* CONTROLES DE CANTIDAD */}
-    <View style={styles.cantidadRow}>
-      <Pressable
-        style={styles.qtyButton}
-        onPress={() => disminuirCantidad(item.id)}
-      >
-        <Text style={styles.qtyText}>−</Text>
-      </Pressable>
+                    {/* CONTROLES DE CANTIDAD */}
+                    <View style={styles.cantidadRow}>
+                      <Pressable
+                        style={styles.qtyButton}
+                        onPress={() => disminuirCantidad(item.id)}
+                      >
+                        <Text style={styles.qtyText}>−</Text>
+                      </Pressable>
 
-      <Text style={styles.cantidad}>{item.cantidad}</Text>
+                      <Text style={styles.cantidad}>{item.cantidad}</Text>
 
-      <Pressable
-        style={styles.qtyButton}
-        onPress={() => aumentarCantidad(item.id)}
-      >
-        <Text style={styles.qtyText}>+</Text>
-      </Pressable>
-    </View>
-  </View>
-</View>
-
-          )}
-        />
-        <View style={styles.totalContainer}>
-          <Text style={styles.totalText}>Total a pagar:</Text>
-          <Text style={styles.totalAmount}>Gs. {total}</Text>
-        <View style={[styles.botonOverlay, {}] } />
-        <Pressable
-  style={styles.button}
-  onPress={() => {
-    if (carrito.length === 0) return;
-    router.push('/pago');
-  }}
->
-  <Text style={[styles.text, { top: 2, color: "#FFFFFF" }]}>Realizar Pedido</Text>
-</Pressable>
-        
-        </View>
+                      <Pressable
+                        style={styles.qtyButton}
+                        onPress={() => aumentarCantidad(item.id)}
+                      >
+                        <Text style={styles.qtyText}>+</Text>
+                      </Pressable>
+                    </View>
+                  </View>
+                </View>
+              )}
+            />
+            <View style={styles.totalContainer}>
+              <Text style={styles.totalText}>Total a pagar:</Text>
+              <Text style={styles.totalAmount}>Gs. {total}</Text>
+              <View style={[styles.botonOverlay, {}] } />
+              <Pressable
+                style={styles.button}
+                onPress={() => {
+                  if (carrito.length === 0) return;
+                  if (!usuario) {
+                    Alert.alert("Atención", "Debe iniciar sesión para realizar un pedido");
+                    return;
+                  }
+                  router.push('/pago');
+                }}
+              >
+                <Text style={[styles.text, { top: 2, color: "#FFFFFF" }]}>Realizar Pedido</Text>
+              </Pressable>
+            </View>
+          </>
+        )}
       </View>
     </View>
   );
@@ -145,8 +160,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#9B7C66',
     justifyContent: 'space-between',
     alignItems: 'center',
-    width: '40%',  
-    alignSelf: 'center',
+    width: '100%',
   },
   totalText: {
     fontSize: 16,
@@ -177,11 +191,26 @@ qtyButton: {
   borderRadius: 6,
   paddingHorizontal: 10,
   paddingVertical: 2,
+  marginHorizontal: 10,
 },
 
 qtyText: {
   fontSize: 18,
   fontWeight: 'bold',
   color: '#9B7C66',
+},
+emptyContainer: {
+  flex: 1,
+  justifyContent: 'center',
+  alignItems: 'center',
+},
+emptyText: {
+  fontSize: 18,
+  color: '#9B7C66',
+  textAlign: 'center',
+},
+link: {
+  color: '#E9AE50',
+  textDecorationLine: 'underline',
 },
 });

@@ -97,7 +97,6 @@ export default function AnteikuCatalogScreen() {
       <StatusBar barStyle="dark-content" />
 
       <ScrollView style={styles.scrollContainer} showsVerticalScrollIndicator={false}>
-
         {/* Barra de búsqueda */}
         <View style={styles.searchBarContainer}>
           <FontAwesome name="search" size={20} color="#A08879" style={styles.searchIcon} />
@@ -246,7 +245,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#F5EFEA',
     borderRadius: 12,
-    paddingHorizontal: 12,
+    borderWidth: 2,
+    marginTop: 10,
+    borderColor: '#9B7C66',
+    paddingHorizontal: 10,
     paddingVertical: 10,
     marginBottom: 16,
   },

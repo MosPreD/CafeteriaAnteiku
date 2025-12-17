@@ -1,17 +1,19 @@
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
-  Dimensions,
-  Image,
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    Alert,
+    Dimensions,
+    Image,
+    SafeAreaView,
+    ScrollView,
+    StatusBar,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from 'react-native';
+import { API_URL } from './config/api';
 
 const { width } = Dimensions.get('window');
 
@@ -22,8 +24,37 @@ const AnteikuRegisterScreen = () => {
     const [password, setPassword] = useState('');
     const router = useRouter();
 
-    const handleRegister = () => {
-        console.log('Crear cuenta con:', name, email, password);
+    const handleRegister = async () => {
+        if (!name || !email || !password) {
+            Alert.alert('Error', 'Por favor completa todos los campos');
+            return;
+        }
+
+        try {
+            const response = await fetch(`${API_URL}/register`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    nombre: name,
+                    email,
+                    password,
+                }),
+            });
+
+            if (response.ok) {
+                Alert.alert('Éxito', 'Cuenta creada exitosamente', [
+                    { text: 'OK', onPress: () => router.push('/login') }
+                ]);
+            } else {
+                const errorData = await response.json();
+                Alert.alert('Error', errorData.detail || 'Error al registrar');
+            }
+        } catch (error) {
+            console.error('Error en registro:', error);
+            Alert.alert('Error', 'Error de conexión');
+        }
     };
 
     const Logo = () => (

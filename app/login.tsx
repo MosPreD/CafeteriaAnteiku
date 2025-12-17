@@ -14,7 +14,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import userService from './services/UserService';
+import { API_URL } from './config/api';
 
 import { useAuth } from "@/app/context/AuthContext";
 
@@ -44,29 +44,35 @@ const AnteikuLoginScreen = () => {
     try {
       console.log('Intentando login con:', email);
       
-      const usuario = await userService.login(email, password);
+      const response = await fetch(`${API_URL}/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
 
-if (usuario) {
-  await login(usuario); // 🔥 AVISA AL AUTHCONTEXT
+      if (response.ok) {
+        const usuario = await response.json();
 
-  Alert.alert(
-    '¡Bienvenido!',
-    `Hola ${usuario.nombre}, has iniciado sesión exitosamente`,
-    [
-      {
-        text: 'OK',
-        onPress: () => {
-          router.replace('/(tabs)/catalogo'); 
-        }
-      }
-    ]
-  );
+        await login(usuario); // 🔥 AVISA AL AUTHCONTEXT
 
-  setEmail('');
-  setPassword('');
-}
+        Alert.alert(
+          '¡Bienvenido!',
+          `Hola ${usuario.nombre}, has iniciado sesión exitosamente`,
+          [
+            {
+              text: 'OK',
+              onPress: () => {
+                router.replace('/(tabs)/catalogo'); 
+              }
+            }
+          ]
+        );
 
- else {
+        setEmail('');
+        setPassword('');
+      } else {
         Alert.alert('Error', 'Email o contraseña incorrectos');
       }
     } catch (error: any) {

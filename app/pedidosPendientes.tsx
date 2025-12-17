@@ -4,11 +4,11 @@ import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import PedidoPendiente from '@/components/PedidoPendiente';
 import { Producto } from "@/components/types";
 
-import { usePedidos } from "@/app/context/PedidosContext";
+import { Pedido, usePedidos } from "@/app/context/PedidosContext";
 import { Stack } from 'expo-router';
 
 
-type Pedido = {
+type LocalPedido = {
   id: string;
   nroPedido: string;
   productos: Producto[];
@@ -16,26 +16,24 @@ type Pedido = {
 
 type Props = {
   item: Pedido;
-  onLimpiar: (id: string) => void;
+  onLimpiar: (id: number) => void;
 };
 
 export function PedidoItem({ item, onLimpiar }: Props) {
 
-  const pedidoEstaListo = item.productos.every(
-  (p) => p.estado === "listo"
-);
+  const pedidoEstaListo = item.estado === "listo";
   
   return (
     <View style={{ marginBottom: 30 }}>
       <PedidoPendiente
-        nroPedido={item.nroPedido}
-        productos={item.productos}
+        nroPedido={item.id.toString()}
+        productos={[]}
       />
 
       {pedidoEstaListo && (
         <Pressable
           style={styles.button}
-          onPress={() => onLimpiar(item.id)}
+          onPress={async () => await onLimpiar(item.id)}
         >
           <Text style={styles.text}>Limpiar Pedido</Text>
         </Pressable>
@@ -57,7 +55,7 @@ export default function PedidosPendientesScreen() {
       style={{ backgroundColor: "#EFE6DD" }}
       contentContainerStyle={{ paddingBottom: 40 }}
       data={pedidos}
-      keyExtractor={(item) => item.id}
+      keyExtractor={(item) => item.id.toString()}
       renderItem={({ item }) => (
         <PedidoItem
           item={item}

@@ -25,7 +25,7 @@ export default function PagoScreen() {
   const { carrito, limpiarCarrito } = useCarrito();
   const { crearPedido  } = usePedidos();
 const { usuario } = useAuth();
-  const pagar = () => {
+  const pagar = async () => {
   const servicio = new ServicioPago();
 
   const pago: Pago = {
@@ -36,7 +36,7 @@ const { usuario } = useAuth();
     status: 'pendiente',
   };
 
-  const ok = servicio.procesarPago(pago);
+  const ok = await servicio.procesarPago(pago);
 
   setMensaje(
     pago.status === 'completado'
@@ -197,8 +197,8 @@ const { usuario } = useAuth();
           </View>
         );
       })()}
-            <Pressable style={[styles.button, { flexDirection: "row", top: 80, backgroundColor:"#ffffff1a" }]} onPress={() => {
-              const ok = pagar();
+            <Pressable style={[styles.button, { flexDirection: "row", top: 80, backgroundColor:"#ffffff1a" }]} onPress={async () => {
+              const ok = await pagar();
               setOpenPopupPagar(false);
               if (ok) {
                 setOpenPopupFinalizar(true);
