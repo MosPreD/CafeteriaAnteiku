@@ -71,27 +71,24 @@ const { usuario } = useAuth();
     setOpenPopupPagar(true);
   };
 
-  const finalizarPago = async () => {
-  if (!usuario) {
-    alert("Debe iniciar sesión para realizar un pedido");
-    return;
-  }
-
+const finalizarPago = async () => {
   if (carrito.length === 0) return;
-
   try {
-    for (const item of carrito) {
-      await crearPedido(item.tipoCafe, item.cantidad);
-    }
-
+    const promises = carrito.map(item => 
+      crearPedido(item.tipoCafe, item.cantidad)
+    );
+    
+    await Promise.all(promises);
     limpiarCarrito();
     setOpenPopupFinalizar(false);
-    router.replace('/');
+    
+    router.push('/pedidosPendientes');
+    
   } catch (err: any) {
-    console.error(err);
-    setError(err.message || "Error al crear pedido");
+    console.error('Error al crear pedidos:', err);
+    setError(err.message || "Error al procesar el pedido");
     setOpenPopupError(true);
-  }
+  } 
 };
 
 
@@ -104,8 +101,8 @@ const { usuario } = useAuth();
     <View style={styles.container}>
       <Text style={[styles.title,{ position: 'absolute', top: 50}]}>Metodo de pago</Text>
 
-      <Pressable style={[styles.box, { bottom: 120, backgroundColor:"#9B7C66" }]} onPress={() => setOpenPopupTipoPago(true)}>
-        <Ionicons name="card-outline" size={48} color="#e9ad55ff" />
+      <Pressable style={[styles.box, { bottom: 120, backgroundColor:"#b3a8a1ff" }]} onPress={() => setOpenPopupTipoPago(true)}>
+        <Ionicons name="card-outline" size={48} color="#6e5353ff" />
         <Text style={styles.text}>
           {metodoSeleccionado
             ? `Método: \n${metodoSeleccionado}`
@@ -115,7 +112,7 @@ const { usuario } = useAuth();
 
 
     <View style={{backgroundColor: '#EFE6DD',justifyContent: 'center', alignItems: 'center', bottom:100, borderRadius: 10, }}>
-      <Ionicons name="book-outline" size={38} color="#e9ad55ff" style={{top:30, right:90}}></Ionicons>
+      <Ionicons name="book-outline" size={38} color="#afa391ff" style={{top:30, right:90}}></Ionicons>
       <Text style={styles.text}>Datos de facturacion</Text>
       <Text style={[styles.text, {left:0, marginTop:5}]}>C.I o RUC</Text>
       <TextInput style={[styles.text, styles.inputBox]} placeholder="CI / RUC" value={ciRuc} onChangeText={setCiRuc}/>
@@ -127,7 +124,7 @@ const { usuario } = useAuth();
 
       <Pressable style={[styles.button, { flexDirection: "row", top: 100 }]} onPress={handlePagar}>
         <Text style={[styles.text, { top: 2, color: "#FFFFFF" }]}>Pagar</Text>
-        <Ionicons name="bag-check-outline" size={24} color="#e9ad55ff" style={{ left: 10, bottom: 3 }}/>
+        <Ionicons name="bag-check-outline" size={24} color="#afa391ff" style={{ left: 10, bottom: 3 }}/>
       </Pressable>
     
     {openPopupTipoPago && (
@@ -155,7 +152,7 @@ const { usuario } = useAuth();
                 setOpenPopupTipoPago(false);
               }}
             >
-              <Ionicons name={item.icon as any} size={28} color="#E9AE50" />
+              <Ionicons name={item.icon as any} size={28} color="#3d311eff" />
               <Text style={styles.metodoText}>{item.label}</Text>
             </Pressable>
           ))}
@@ -188,7 +185,7 @@ const { usuario } = useAuth();
             <Ionicons
               name={metodo.icon as any}
               size={28}
-              color="#E9AE50"
+              color="#7c6c54ff"
               style={{ marginRight: 8 }}
             />
             <Text style={[styles.metodoText, { fontWeight: 'bold' }]}>
@@ -207,7 +204,7 @@ const { usuario } = useAuth();
                 setOpenPopupError(true);
               }}}>
           <Text style={[styles.text, {top:2, color:"#FFFFFF"}]}>Proceder</Text>
-          <Ionicons name="checkmark-circle-outline" size={24} color="#e9ad55ff" style={{left:10, bottom:0,}}></Ionicons>
+          <Ionicons name="checkmark-circle-outline" size={24} color="#7c6c54ff" style={{left:10, bottom:0,}}></Ionicons>
         </Pressable>
         </View>
       </View>
@@ -232,7 +229,7 @@ const { usuario } = useAuth();
        <View style={styles.popupOverlay}>
         <View style={[styles.popup, {width: 350, height: 150}]}>
           <Pressable style={[styles.closeButton, {bottom:110, left:310}]} onPress={() => {setOpenPopupError(false);}}>
-            <Ionicons name="close-circle-outline" size={32} color="#fff" />
+            <Ionicons name="close-circle-outline" size={32} color="#ddc9c9ff" />
           </Pressable>
           <Text style={styles.metodoText}>{error}</Text>
         </View>
@@ -268,6 +265,8 @@ const styles = StyleSheet.create({
     alignSelf: "center",
   },
   text: {
+    fontSize: 16,
+    marginStart: 10,
     fontWeight: "bold",
     textAlign: "center",
   },
@@ -295,13 +294,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     width: 300,
     height: 400,
-    backgroundColor:"#9B7C66", 
+    backgroundColor:"#a79a91ff", 
   },
   closeButton: {
     position: 'absolute',
     bottom: 360,
     left: 260,
-    backgroundColor: '#9B7C66',
     fontSize: 30,
   },
   popupOverlay: {
