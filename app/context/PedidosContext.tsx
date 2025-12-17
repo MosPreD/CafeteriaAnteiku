@@ -1,39 +1,92 @@
-import { Producto } from "@/components/types";
-import { createContext, ReactNode, useContext, useState } from "react";
+import { API_URL } from "@/app/config/api";
+import { useAuth } from "@/app/context/AuthContext";
+import { createContext, ReactNode, useContext, useEffect, useState } from "react";
 
 export type Pedido = {
-  id: string;
-  nroPedido: string;
-  productos: Producto[];
+  id: number;
+  producto: string;
+  cantidad: number;
+  estado: string;
 };
 
 type PedidosContextType = {
   pedidos: Pedido[];
-  agregarPedido: (productos: Producto[]) => void;
-  limpiarPedido: (id: string) => void;
+  cargarPedidos: () => Promise<void>;
+  crearPedido: (producto: string, cantidad: number) => Promise<void>;
+  limpiarPedido: (id: number) => Promise<void>;
+  pedidoListo: (id: number) => boolean;
 };
 
 const PedidosContext = createContext<PedidosContextType | undefined>(undefined);
 
 export function PedidosProvider({ children }: { children: ReactNode }) {
+  const { usuario } = useAuth(); // 🔥 CLAVE
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
 
-  const agregarPedido = (productos: Producto[]) => {
-    const nuevoPedido: Pedido = {
-      id: Date.now().toString(),
-      nroPedido: `#${(pedidos.length + 1).toString().padStart(3, "0")}`,
-      productos,
-    };
+  // -------- cargar pedidos --------
+  const cargarPedidos = async () => {
+    if (!usuario) return;
 
-    setPedidos(prev => [...prev, nuevoPedido]);
+    const res = await fetch(`${API_URL}/pedidos/${usuario.id}`);
+    if (!res.ok) return;
+
+    const data = await res.json();
+    setPedidos(data);
   };
 
-  const limpiarPedido = (id: string) => {
+  useEffect(() => {
+    cargarPedidos();
+  }, [usuario]);
+
+  // -------- crear pedido --------
+  const crearPedido = async (producto: string, cantidad: number) => {
+  if (!usuario) {
+    console.error("Usuario no cargado");
+    throw new Error("Debe iniciar sesión para realizar un pedido");
+  }
+
+  const response = await fetch(`${API_URL}/pedidos`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      usuario_id: usuario.id, // 🔥 AHORA SÍ EXISTE
+      producto,
+      cantidad,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error("Error al crear pedido");
+  }
+};
+
+
+  // -------- limpiar pedido --------
+  const limpiarPedido = async (id: number) => {
+    await fetch(`${API_URL}/pedidos/${id}`, {
+      method: "DELETE"
+    });
+
     setPedidos(prev => prev.filter(p => p.id !== id));
   };
 
+  const pedidoListo = (id: number) => {
+    const pedido = pedidos.find(p => p.id === id);
+    return pedido?.estado === "Listo";
+  };
+
   return (
-    <PedidosContext.Provider value={{ pedidos, agregarPedido, limpiarPedido }}>
+    <PedidosContext.Provider
+      value={{
+        pedidos,
+        cargarPedidos,
+        crearPedido,
+        limpiarPedido,
+        pedidoListo
+      }}
+    >
       {children}
     </PedidosContext.Provider>
   );

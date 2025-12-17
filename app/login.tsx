@@ -14,8 +14,10 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { useDatabase } from '../contexts/databaseContext';
-import { userService } from './services/UserService';
+import userService from './services/UserService';
+
+import { useAuth } from "@/app/context/AuthContext";
+
 
 const { width } = Dimensions.get('window');
 
@@ -24,16 +26,12 @@ const AnteikuLoginScreen = () => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [isInitializing, setIsInitializing] = useState(true);
-  
+  const { login } = useAuth();
   const router = useRouter();
-  const { db, isReady } = useDatabase(); // Usamos el contexto
 
   useEffect(() => {
-    if (db && isReady) {
-      // La base de datos ya está configurada en el contexto
-      setIsInitializing(false);
-    }
-  }, [db, isReady]);
+  setIsInitializing(false);
+}, []);
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -47,27 +45,28 @@ const AnteikuLoginScreen = () => {
       console.log('Intentando login con:', email);
       
       const usuario = await userService.login(email, password);
-      
-      if (usuario) {
-        console.log('Login exitoso:', usuario.nombre);
-        Alert.alert(
-          '¡Bienvenido!',
-          `Hola ${usuario.nombre}, has iniciado sesión exitosamente`,
-          [
-            {
-              text: 'OK',
-              onPress: () => {
-                router.replace('/(tabs)/catalogo'); 
-              }
-            }
-          ]
-        );
-        
-        // Limpiar campos
-        setEmail('');
-        setPassword('');
-        
-      } else {
+
+if (usuario) {
+  await login(usuario); // 🔥 AVISA AL AUTHCONTEXT
+
+  Alert.alert(
+    '¡Bienvenido!',
+    `Hola ${usuario.nombre}, has iniciado sesión exitosamente`,
+    [
+      {
+        text: 'OK',
+        onPress: () => {
+          router.replace('/(tabs)/catalogo'); 
+        }
+      }
+    ]
+  );
+
+  setEmail('');
+  setPassword('');
+}
+
+ else {
         Alert.alert('Error', 'Email o contraseña incorrectos');
       }
     } catch (error: any) {
@@ -77,6 +76,16 @@ const AnteikuLoginScreen = () => {
       setLoading(false);
     }
   };
+  if (isInitializing) {
+  return (
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#A08879" />
+        <Text style={styles.loadingText}>Inicializando...</Text>
+      </View>
+    </SafeAreaView>
+  );
+}
 
   const handleRegister = () => {
     router.push('/register');
@@ -94,18 +103,6 @@ const AnteikuLoginScreen = () => {
       resizeMode="contain"
     />
   );
-
-  // Mostrar loading mientras se inicializa la DB
-  if (isInitializing || !isReady) {
-    return (
-      <SafeAreaView style={styles.safeArea}>
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#A08879" />
-          <Text style={styles.loadingText}>Inicializando base de datos...</Text>
-        </View>
-      </SafeAreaView>
-    );
-  }
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -170,19 +167,6 @@ const AnteikuLoginScreen = () => {
           </TouchableOpacity>
         </View>
 
-        {/* --- Información sobre almacenamiento local --- */}
-        <View style={styles.infoBox}>
-          <Text style={styles.infoTitle}>📱 Datos locales</Text>
-          <Text style={styles.infoText}>
-            • Tu información se guarda de forma segura en este dispositivo
-          </Text>
-          <Text style={styles.infoText}>
-            • Funciona completamente sin conexión a internet
-          </Text>
-          <Text style={styles.infoText}>
-            • Solo tú tienes acceso a tus datos
-          </Text>
-        </View>
       </ScrollView>
     </SafeAreaView>
   );

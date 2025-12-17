@@ -1,4 +1,4 @@
-import { MetodoPago } from '@/components/tiposPagos';
+import { MetodoPago, Pago, ServicioPago } from '@/components/tiposPagos';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useState } from 'react';
@@ -6,11 +6,14 @@ import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { Stack } from 'expo-router';
 
+import { useAuth } from "@/app/context/AuthContext";
 import { useCarrito } from "@/app/context/CarritoContext";
 import { usePedidos } from "@/app/context/PedidosContext";
 
-export default function PagoScreen() {
 
+export default function PagoScreen() {
+  const [openPopup, setOpenPopup] = useState(false);
+  const [mensaje, setMensaje] = useState('');
   const [openPopupTipoPago, setOpenPopupTipoPago] = useState(false);
   const [openPopupPagar, setOpenPopupPagar] = useState(false);
   const [openPopupFinalizar, setOpenPopupFinalizar] = useState(false);
@@ -20,7 +23,29 @@ export default function PagoScreen() {
   const [error, setError] = useState('');
   const [openPopupError, setOpenPopupError] = useState(false);
   const { carrito, limpiarCarrito } = useCarrito();
-  const { agregarPedido } = usePedidos();
+  const { crearPedido  } = usePedidos();
+const { usuario } = useAuth();
+  const pagar = () => {
+  const servicio = new ServicioPago();
+
+  const pago: Pago = {
+    id: Date.now().toString(),
+    metodo: metodoSeleccionado!,
+    cantidad: 1500,
+    fecha: new Date(),
+    status: 'pendiente',
+  };
+
+  const ok = servicio.procesarPago(pago);
+
+  setMensaje(
+    pago.status === 'completado'
+      ? '✅ Pago aprobado'
+      : '❌ Pago rechazado'
+  );
+
+  return ok;
+};
   
   const METODOS_PAGO = [
     { key: MetodoPago.TARJETA, label: 'Tarjeta', icon: 'card-outline' },
@@ -46,24 +71,30 @@ export default function PagoScreen() {
     setOpenPopupPagar(true);
   };
 
-  const finalizarPago = () => {
-    if (carrito.length === 0) return;
+  const finalizarPago = async () => {
+  if (!usuario) {
+    alert("Debe iniciar sesión para realizar un pedido");
+    return;
+  }
 
-    agregarPedido(
-      carrito.map(item => ({
-        id: item.id,
-        nombre: item.nombre,
-        tipoCafe: item.tipoCafe,
-        cantidad: item.cantidad,
-        estado: "pendiente" as const,
-      }))
-    );
+  if (carrito.length === 0) return;
+
+  try {
+    for (const item of carrito) {
+      await crearPedido(item.tipoCafe, item.cantidad);
+    }
+
     limpiarCarrito();
-
-    // 👉 CERRAR POPUP Y VOLVER A INICIO
     setOpenPopupFinalizar(false);
     router.replace('/');
-  };
+  } catch (err: any) {
+    console.error(err);
+    setError(err.message || "Error al crear pedido");
+    setOpenPopupError(true);
+  }
+};
+
+
 
   return (
     <View style={[{paddingTop:50, flex:1, backgroundColor: '#EFE6DD'}]}>
@@ -98,7 +129,6 @@ export default function PagoScreen() {
         <Text style={[styles.text, { top: 2, color: "#FFFFFF" }]}>Pagar</Text>
         <Ionicons name="bag-check-outline" size={24} color="#e9ad55ff" style={{ left: 10, bottom: 3 }}/>
       </Pressable>
-      <Text style={[styles.text, {left:0, top:5, fontSize:18}]}>Total a pagar: XXXXXXX</Text>
     
     {openPopupTipoPago && (
       <View style={styles.popupOverlay}>
@@ -167,8 +197,16 @@ export default function PagoScreen() {
           </View>
         );
       })()}
-        <Pressable style={[styles.button, {flexDirection: "row", top:80, backgroundColor:"#ffffff1a"}]} onPress={() => setOpenPopupPagar(false)}>
-          <Text style={[styles.text, {top:2, color:"#FFFFFF"}]} onPress={() => setOpenPopupFinalizar(true)}>Proceder</Text>
+            <Pressable style={[styles.button, { flexDirection: "row", top: 80, backgroundColor:"#ffffff1a" }]} onPress={() => {
+              const ok = pagar();
+              setOpenPopupPagar(false);
+              if (ok) {
+                setOpenPopupFinalizar(true);
+              } else {
+                setError('Pago rechazado');
+                setOpenPopupError(true);
+              }}}>
+          <Text style={[styles.text, {top:2, color:"#FFFFFF"}]}>Proceder</Text>
           <Ionicons name="checkmark-circle-outline" size={24} color="#e9ad55ff" style={{left:10, bottom:0,}}></Ionicons>
         </Pressable>
         </View>
@@ -185,6 +223,7 @@ export default function PagoScreen() {
       </Pressable>
 
           <Text style={styles.metodoText}>Pago realizado con exito</Text>
+          
         </View>
        </View>
     )

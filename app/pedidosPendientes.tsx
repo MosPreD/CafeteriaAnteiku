@@ -20,6 +20,11 @@ type Props = {
 };
 
 export function PedidoItem({ item, onLimpiar }: Props) {
+
+  const pedidoEstaListo = item.productos.every(
+  (p) => p.estado === "listo"
+);
+  
   return (
     <View style={{ marginBottom: 30 }}>
       <PedidoPendiente
@@ -27,12 +32,14 @@ export function PedidoItem({ item, onLimpiar }: Props) {
         productos={item.productos}
       />
 
-      <Pressable
-        style={styles.button}
-        onPress={() => onLimpiar(item.id)}
-      >
-        <Text style={styles.text}>Limpiar Pedido</Text>
-      </Pressable>
+      {pedidoEstaListo && (
+        <Pressable
+          style={styles.button}
+          onPress={() => onLimpiar(item.id)}
+        >
+          <Text style={styles.text}>Limpiar Pedido</Text>
+        </Pressable>
+      )}
     </View>
   );
 }

@@ -1,3 +1,4 @@
+import { AuthProvider } from "@/app/context/AuthContext";
 import { CarritoProvider } from "@/app/context/CarritoContext";
 import { PedidosProvider } from "@/app/context/PedidosContext";
 import FontAwesome from '@expo/vector-icons/FontAwesome';
@@ -8,7 +9,6 @@ import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import { View } from 'react-native';
 import 'react-native-reanimated';
-
 
 const CustomTheme = {
   ...DefaultTheme,
@@ -60,8 +60,10 @@ export default function RootLayout() {
 
 function RootLayoutNav() {
   return (
+    <AuthProvider>
      <CarritoProvider>
       <PedidosProvider>
+
     <View style={{flex:1, backgroundColor: '#FAF7F3'}}>
     <ThemeProvider value={CustomTheme}>
       <Stack
@@ -84,5 +86,6 @@ function RootLayoutNav() {
     </View>
     </PedidosProvider>
     </CarritoProvider>
+    </AuthProvider>
   );
 }

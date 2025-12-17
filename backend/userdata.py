@@ -23,6 +23,3 @@ def guardar_usuario(nombre, email, password):
 
     cursor.close()
     conexion.close()
-
-
-#guardar_usuario("Ulises", "yamilgay@mail.com", "123456")
