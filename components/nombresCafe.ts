@@ -1,0 +1,15 @@
+export const nombresCafe: Record<string, string> = {
+    americano: "Americano",
+    capuchino: "Capuchino",
+    expreso: "Expreso",
+    latte: "Latte",
+    mocha: "Mocha",
+    cafe_leche: "Cafe Con Leche",
+    caramel_macchiato: "Macchiato",
+    cortado:  "Cortado",
+    doble: "Doble",
+    frappe: "Frappe",
+    hawaiano: "Hawaiano",
+    vienes: "Vienes",
+    macchiato:  "Macchiato",
+};

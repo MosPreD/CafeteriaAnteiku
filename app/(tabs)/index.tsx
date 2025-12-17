@@ -1,7 +1,9 @@
 import { Image, StyleSheet, Text, TouchableOpacity } from 'react-native';
 
 import { View } from '@/components/Themed';
+import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
+
 
 export default function IndexScreen() {
   return (
@@ -9,6 +11,7 @@ export default function IndexScreen() {
       <Image style={styles.header} source={require('@/assets/images/iconoAnteiku.png')} resizeMode="contain"/>
       <View style={styles.separator} lightColor="#75370A" darkColor="rgba(255,255,255,0.1)">
         <Text style={styles.title}>¡BIENVENIDO!</Text>
+        
       </View>
       <TouchableOpacity style={styles.button} onPress={() => router.push('/login')}>
         <Text style={styles.buttonText}>Iniciar Sesión</Text>
@@ -16,6 +19,8 @@ export default function IndexScreen() {
       <TouchableOpacity style={styles.button} onPress={() => router.push('/register')}>
         <Text style={styles.buttonText}>Registrarse</Text>
       </TouchableOpacity>
+      <Text style={styles.text}>Pedi lo que más te gusta y retiralo de nuestro local central! <Ionicons name="heart" size={20} color="#75370A" /></Text>
+      <Text style={[styles.text, { fontSize:12}]}>-no trabajamos con delivery :)-</Text>
     </View>
     
   );
@@ -35,6 +40,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 10,
+  },
+  text: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#75370A',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 20,
   },
   separator: {
     marginVertical: 30,

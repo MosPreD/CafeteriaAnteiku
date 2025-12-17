@@ -15,6 +15,7 @@ type PedidosContextType = {
   crearPedido: (producto: string, cantidad: number) => Promise<void>;
   limpiarPedido: (id: number) => Promise<void>;
   pedidoListo: (id: number) => boolean;
+  marcarPedidoListo: (id: number) => void;
 };
 
 const PedidosContext = createContext<PedidosContextType | undefined>(undefined);
@@ -23,16 +24,33 @@ export function PedidosProvider({ children }: { children: ReactNode }) {
   const { usuario } = useAuth(); // 🔥 CLAVE
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
 
-  // -------- cargar pedidos --------
-  const cargarPedidos = async () => {
-    if (!usuario) return;
+  const marcarPedidoListo = (id: number) => {
+  setPedidos(prev =>
+    prev.map(p =>
+      p.id === id ? { ...p, estado: "Listo" } : p
+    )
+  );
+};
 
+  // -------- cargar pedidos --------
+const cargarPedidos = async () => {
+  if (!usuario) return;
+
+  try {
     const res = await fetch(`${API_URL}/pedidos/${usuario.id}`);
-    if (!res.ok) return;
+
+    if (!res.ok) {
+      console.error("Error HTTP:", res.status);
+      return;
+    }
 
     const data = await res.json();
     setPedidos(data);
-  };
+
+  } catch (error) {
+    console.error("Error de conexión al cargar pedidos:", error);
+  }
+};
 
   useEffect(() => {
     cargarPedidos();
@@ -51,7 +69,7 @@ export function PedidosProvider({ children }: { children: ReactNode }) {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      usuario_id: usuario.id, // 🔥 AHORA SÍ EXISTE
+      usuario_id: usuario.id,
       producto,
       cantidad,
     }),
@@ -84,7 +102,8 @@ export function PedidosProvider({ children }: { children: ReactNode }) {
         cargarPedidos,
         crearPedido,
         limpiarPedido,
-        pedidoListo
+        pedidoListo,
+        marcarPedidoListo,
       }}
     >
       {children}
